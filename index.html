@@ -6,367 +6,118 @@
 <title>NaiBaaN POS</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
-
   :root {
-    --cream:    #F5EFE6;
-    --cream2:   #EDE0CC;
-    --brown-lt: #C8A882;
-    --brown:    #8B5E3C;
-    --brown-dk: #5C3D1E;
-    --red:      #9B2335;
-    --red-lt:   #F5E6E8;
-    --white:    #FFFDF9;
-    --text:     #3A2410;
-    --text-md:  #7A5C3E;
-    --text-lt:  #B09070;
-    --border:   #DDD0BC;
-    --shadow:   0 2px 8px rgba(90,50,10,0.08);
+    --cream:#F5EFE6;--cream2:#EDE0CC;--brown-lt:#C8A882;--brown:#8B5E3C;
+    --brown-dk:#5C3D1E;--red:#9B2335;--red-lt:#F5E6E8;--white:#FFFDF9;
+    --text:#3A2410;--text-md:#7A5C3E;--text-lt:#B09070;--border:#DDD0BC;
+    --shadow:0 2px 8px rgba(90,50,10,0.08);
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    font-family: 'Sarabun', sans-serif;
-    background: var(--cream);
-    color: var(--text);
-    min-height: 100vh;
-    overscroll-behavior: none;
-  }
-
-  /* ── HEADER ── */
-  .header {
-    background: var(--brown-dk);
-    padding: 0 20px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .brand { display: flex; flex-direction: column; }
-  .brand-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 16px;
-    color: var(--cream);
-    line-height: 1.2;
-    letter-spacing: 0.3px;
-  }
-  .brand-sub { font-size: 10px; color: var(--brown-lt); font-weight: 300; }
-  .header-right { display: flex; align-items: center; gap: 6px; }
-  .clock { font-size: 11px; color: var(--brown-lt); margin-right: 8px; }
-  .nav-btn {
-    padding: 7px 16px;
-    border-radius: 20px;
-    border: 1.5px solid transparent;
-    font-family: 'Sarabun', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.18s;
-    color: var(--cream2);
-    background: transparent;
-  }
-  .nav-btn:hover { background: rgba(255,255,255,0.1); }
-  .nav-btn.active {
-    background: var(--red);
-    border-color: var(--red);
-    color: #fff;
-  }
-
-  /* ── STATS ── */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    padding: 14px 16px;
-    background: var(--brown-dk);
-    border-bottom: 1px solid var(--brown);
-  }
-  .stat {
-    background: rgba(255,255,255,0.07);
-    border-radius: 10px;
-    padding: 9px 12px;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
-  .stat .lbl { font-size: 10px; color: var(--brown-lt); font-weight: 300; margin-bottom: 2px; }
-  .stat .val { font-size: 20px; font-weight: 600; color: var(--cream); }
-
-  /* ── LAYOUT ── */
-  .page { display: none; }
-  .page.active { display: block; }
-  .pos-wrap {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    height: calc(100vh - 116px);
-  }
-
-  /* ── MENU PANEL ── */
-  .menu-panel {
-    background: var(--cream);
-    overflow-y: auto;
-    padding: 14px 16px;
-    border-right: 1px solid var(--border);
-  }
-  .cats {
-    display: flex;
-    gap: 7px;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-  }
-  .cat-btn {
-    padding: 7px 16px;
-    border-radius: 20px;
-    border: 1.5px solid var(--border);
-    background: var(--white);
-    font-family: 'Sarabun', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    color: var(--text-md);
-    transition: all 0.15s;
-  }
-  .cat-btn:hover { border-color: var(--brown-lt); }
-  .cat-btn.active {
-    background: var(--brown-dk);
-    border-color: var(--brown-dk);
-    color: var(--cream);
-  }
-  .cat-btn.active.c-coffee { background: var(--brown); border-color: var(--brown); }
-  .cat-btn.active.c-matcha { background: #4A7C2F; border-color: #4A7C2F; }
-  .cat-btn.active.c-tea    { background: #7A4F2E; border-color: #7A4F2E; }
-  .cat-btn.active.c-softcream { background: var(--red); border-color: var(--red); }
-
-  /* ── MENU GRID ── */
-  .menu-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 9px;
-  }
-  .menu-btn {
-    position: relative;
-    background: var(--white);
-    border: 1.5px solid var(--border);
-    border-radius: 12px;
-    padding: 13px 8px 10px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.12s;
-    user-select: none;
-  }
-  .menu-btn:hover { border-color: var(--brown-lt); background: var(--cream); transform: translateY(-1px); box-shadow: var(--shadow); }
-  .menu-btn:active { transform: scale(0.95); background: var(--cream2); }
-  .menu-btn.in-cart { border-color: var(--brown); background: #FDF6EE; }
-  .menu-btn .icon { font-size: 28px; display: block; margin-bottom: 5px; }
-  .menu-btn .mname { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1.3; }
-  .menu-btn .mname-th { font-size: 10px; color: var(--text-lt); margin-top: 1px; line-height: 1.2; }
-  .menu-btn .mprice { font-size: 12px; font-weight: 600; color: var(--brown); margin-top: 4px; }
-  .badge {
-    position: absolute;
-    top: 5px; right: 5px;
-    background: var(--red);
-    color: #fff;
-    border-radius: 50%;
-    width: 19px; height: 19px;
-    font-size: 10px; font-weight: 600;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  /* ── ORDER PANEL ── */
-  .order-panel {
-    background: var(--white);
-    display: flex;
-    flex-direction: column;
-    border-left: 1px solid var(--border);
-  }
-  .order-head {
-    padding: 12px 14px 10px;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--brown-dk);
-    background: var(--cream);
-  }
-  .order-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 6px 14px;
-  }
-  .empty-cart {
-    text-align: center;
-    color: var(--text-lt);
-    font-size: 12px;
-    padding: 60px 0;
-    font-weight: 300;
-  }
-  .order-item {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .oi-name { flex: 1; font-size: 12px; color: var(--text); line-height: 1.4; }
-  .oi-name small { display: block; font-size: 10px; color: var(--text-lt); }
-  .qty-wrap { display: flex; align-items: center; gap: 5px; }
-  .qb {
-    width: 27px; height: 27px;
-    border-radius: 50%;
-    border: 1.5px solid var(--border);
-    background: transparent;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text);
-    transition: all 0.12s;
-  }
-  .qb:hover { border-color: var(--brown); }
-  .qb.del { border-color: #DBA0A0; color: var(--red); }
-  .qn { font-size: 14px; font-weight: 600; min-width: 16px; text-align: center; color: var(--text); }
-  .oi-price { font-size: 12px; font-weight: 600; color: var(--brown-dk); min-width: 50px; text-align: right; }
-
-  /* ── TOTAL & CHECKOUT ── */
-  .checkout-area {
-    padding: 12px 14px;
-    background: var(--cream);
-    border-top: 1px solid var(--border);
-  }
-  .total-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 10px;
-  }
-  .total-label { font-size: 13px; font-weight: 500; color: var(--text-md); }
-  .total-val { font-size: 26px; font-weight: 600; color: var(--brown-dk); }
-
-  /* Payment method */
-  .pay-label { font-size: 11px; color: var(--text-md); margin-bottom: 6px; font-weight: 500; }
-  .pay-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 10px; }
-  .pay-btn {
-    padding: 10px 0;
-    border-radius: 9px;
-    border: 2px solid var(--border);
-    background: var(--white);
-    font-family: 'Sarabun', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    color: var(--text-md);
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-  .pay-btn:hover { border-color: var(--brown-lt); }
-  .pay-btn.selected.cash { background: #FDF6EE; border-color: var(--brown); color: var(--brown-dk); }
-  .pay-btn.selected.transfer { background: var(--red-lt); border-color: var(--red); color: var(--red); }
-  .pay-indicator { font-size: 18px; }
-
-  .ok-btn {
-    width: 100%;
-    padding: 14px;
-    background: var(--brown-dk);
-    border: none;
-    border-radius: 10px;
-    color: var(--cream);
-    font-family: 'Sarabun', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-    margin-bottom: 8px;
-    letter-spacing: 0.3px;
-  }
-  .ok-btn:hover { background: var(--brown); }
-  .ok-btn:active { transform: scale(0.98); }
-  .ok-btn:disabled { background: var(--border); color: var(--text-lt); cursor: default; }
-  .ok-btn.ready { background: var(--red); }
-  .ok-btn.ready:hover { background: #7A1A28; }
-  .clear-btn {
-    width: 100%;
-    padding: 8px;
-    background: transparent;
-    border: 1.5px solid var(--border);
-    border-radius: 9px;
-    color: var(--text-lt);
-    font-family: 'Sarabun', sans-serif;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.12s;
-  }
-  .clear-btn:hover { border-color: #DBA0A0; color: var(--red); }
-
-  /* ── SUMMARY PAGE ── */
-  .sum-page { padding: 16px; background: var(--cream); min-height: calc(100vh - 116px); }
-  .sum-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
-  .sum-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 16px;
-  }
-  .sum-card h3 {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-md);
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .sum-row {
-    display: flex;
-    align-items: center;
-    padding: 5px 0;
-    border-bottom: 1px solid #F0E8DC;
-    font-size: 12px;
-    gap: 6px;
-  }
-  .sum-row:last-child { border-bottom: none; }
-  .sr-name { flex: 1; color: var(--text); }
-  .sr-qty { font-size: 10px; color: var(--text-lt); }
-  .sr-val { font-weight: 600; color: var(--brown-dk); }
-  .bar-bg { background: var(--cream2); border-radius: 3px; height: 5px; width: 100%; margin-top: 2px; }
-  .bar-fill { border-radius: 3px; height: 5px; transition: width 0.5s; }
-  .bar-fill.coffee   { background: var(--brown); }
-  .bar-fill.matcha   { background: #4A7C2F; }
-  .bar-fill.tea      { background: #7A4F2E; }
-  .bar-fill.softcream{ background: var(--red); }
-  .bar-fill.default  { background: var(--brown-lt); }
-  .no-data { text-align: center; color: var(--text-lt); font-size: 12px; padding: 20px 0; font-weight: 300; }
-
-  /* ── TOAST ── */
-  .toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--brown-dk);
-    color: var(--cream);
-    padding: 10px 22px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-    z-index: 999;
-    white-space: nowrap;
-    box-shadow: 0 4px 16px rgba(60,20,5,0.25);
-  }
-  .toast.show { opacity: 1; }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Sarabun',sans-serif;background:var(--cream);color:var(--text);height:100vh;overflow:hidden;overscroll-behavior:none;}
+  .header{background:var(--brown-dk);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .brand{display:flex;flex-direction:column;}
+  .brand-name{font-family:'Playfair Display',serif;font-size:15px;color:var(--cream);line-height:1.2;}
+  .brand-sub{font-size:10px;color:var(--brown-lt);font-weight:300;}
+  .header-right{display:flex;align-items:center;gap:6px;}
+  .clock{font-size:11px;color:var(--brown-lt);margin-right:8px;}
+  .nav-btn{padding:6px 15px;border-radius:20px;border:1.5px solid transparent;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.18s;color:var(--cream2);background:transparent;}
+  .nav-btn:hover{background:rgba(255,255,255,0.1);}
+  .nav-btn.active{background:var(--red);border-color:var(--red);color:#fff;}
+  .stats{display:grid;gap:10px;padding:10px 16px;background:var(--brown-dk);border-bottom:1px solid var(--brown);}
+  .stats.pos-stats{grid-template-columns:1fr 1fr 1fr;}
+  .stats.sum-stats{grid-template-columns:repeat(5,1fr);}
+  .stat{background:rgba(255,255,255,0.07);border-radius:10px;padding:7px 12px;border:1px solid rgba(255,255,255,0.1);}
+  .stat .lbl{font-size:10px;color:var(--brown-lt);font-weight:300;margin-bottom:2px;}
+  .stat .val{font-size:18px;font-weight:600;color:var(--cream);}
+  .page{display:none;}
+  .page.active{display:flex;flex-direction:column;}
+  .pos-wrap{display:grid;grid-template-columns:70fr 30fr;height:calc(100vh - 52px - 52px);}
+  .menu-panel{background:var(--cream);overflow-y:auto;padding:12px 14px;border-right:1px solid var(--border);}
+  .cats{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+  .cat-btn{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);font-family:'Sarabun',sans-serif;font-size:12px;font-weight:500;cursor:pointer;color:var(--text-md);transition:all 0.15s;}
+  .cat-btn:hover{border-color:var(--brown-lt);}
+  .cat-btn.active{background:var(--brown-dk);border-color:var(--brown-dk);color:var(--cream);}
+  .cat-btn.active.c-coffee{background:var(--brown);border-color:var(--brown);}
+  .cat-btn.active.c-matcha{background:#4A7C2F;border-color:#4A7C2F;}
+  .cat-btn.active.c-tea{background:#7A4F2E;border-color:#7A4F2E;}
+  .cat-btn.active.c-soda{background:#1869A8;border-color:#1869A8;}
+  .cat-btn.active.c-softcream{background:var(--red);border-color:var(--red);}
+  .cat-btn.active.c-extra{background:#555;border-color:#555;}
+  .menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .extra-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+  .menu-btn{position:relative;background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:12px 6px 9px;cursor:pointer;text-align:center;transition:all 0.12s;user-select:none;}
+  .menu-btn:hover{border-color:var(--brown-lt);background:var(--cream);transform:translateY(-1px);box-shadow:var(--shadow);}
+  .menu-btn:active{transform:scale(0.95);background:var(--cream2);}
+  .menu-btn.in-cart{border-color:var(--brown);background:#FDF6EE;}
+  .menu-btn .icon{font-size:26px;display:block;margin-bottom:4px;}
+  .menu-btn .mname{font-size:11px;font-weight:600;color:var(--text);line-height:1.3;}
+  .menu-btn .mname-th{font-size:10px;color:var(--text-lt);margin-top:1px;line-height:1.2;}
+  .menu-btn .mprice{font-size:12px;font-weight:600;color:var(--brown);margin-top:3px;}
+  .extra-btn{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:22px 8px;cursor:pointer;text-align:center;transition:all 0.12s;user-select:none;font-family:'Sarabun',sans-serif;}
+  .extra-btn:hover{border-color:#888;background:var(--cream);}
+  .extra-btn:active{transform:scale(0.95);background:var(--cream2);}
+  .extra-btn .ep{font-size:18px;font-weight:600;color:var(--text);}
+  .extra-btn .el{font-size:10px;color:var(--text-lt);margin-top:3px;}
+  .badge{position:absolute;top:4px;right:4px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+  .order-panel{background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+  .order-head{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--brown-dk);background:var(--cream);flex-shrink:0;}
+  .order-list{flex:1;overflow-y:auto;padding:4px 12px;}
+  .empty-cart{text-align:center;color:var(--text-lt);font-size:12px;padding:50px 0;font-weight:300;}
+  .order-item{display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid var(--border);}
+  .oi-name{flex:1;font-size:12px;color:var(--text);line-height:1.4;}
+  .oi-name small{display:block;font-size:10px;color:var(--text-lt);}
+  .qty-wrap{display:flex;align-items:center;gap:4px;}
+  .qb{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);background:transparent;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);transition:all 0.12s;}
+  .qb:hover{border-color:var(--brown);}
+  .qb.del{border-color:#DBA0A0;color:var(--red);}
+  .qn{font-size:13px;font-weight:600;min-width:16px;text-align:center;color:var(--text);}
+  .oi-price{font-size:12px;font-weight:600;color:var(--brown-dk);min-width:48px;text-align:right;}
+  .checkout-area{padding:10px 12px;background:var(--cream);border-top:1px solid var(--border);flex-shrink:0;}
+  .total-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;}
+  .total-label{font-size:12px;font-weight:500;color:var(--text-md);}
+  .total-val{font-size:24px;font-weight:600;color:var(--brown-dk);}
+  .pay-label{font-size:11px;color:var(--text-md);margin-bottom:5px;font-weight:500;}
+  .pay-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+  .pay-btn{padding:9px 0;border-radius:9px;border:2px solid var(--border);background:var(--white);font-family:'Sarabun',sans-serif;font-size:14px;font-weight:600;cursor:pointer;color:var(--text-md);transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:5px;}
+  .pay-btn:hover{border-color:var(--brown-lt);}
+  .pay-btn.selected.cash{background:#FDF6EE;border-color:var(--brown);color:var(--brown-dk);}
+  .pay-btn.selected.transfer{background:var(--red-lt);border-color:var(--red);color:var(--red);}
+  .ok-btn{width:100%;padding:13px;background:var(--brown-dk);border:none;border-radius:10px;color:var(--cream);font-family:'Sarabun',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;margin-bottom:6px;}
+  .ok-btn:hover{background:var(--brown);}
+  .ok-btn:active{transform:scale(0.98);}
+  .ok-btn:disabled{background:var(--border);color:var(--text-lt);cursor:default;}
+  .ok-btn.ready{background:var(--red);}
+  .ok-btn.ready:hover{background:#7A1A28;}
+  .clear-btn{width:100%;padding:7px;background:transparent;border:1.5px solid var(--border);border-radius:9px;color:var(--text-lt);font-family:'Sarabun',sans-serif;font-size:12px;cursor:pointer;transition:all 0.12s;}
+  .clear-btn:hover{border-color:#DBA0A0;color:var(--red);}
+  .sum-page{padding:14px;background:var(--cream);overflow-y:auto;flex:1;}
+  .sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .sum-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:13px 15px;}
+  .sum-card h3{font-size:11px;font-weight:600;color:var(--text-md);margin-bottom:9px;text-transform:uppercase;letter-spacing:0.5px;}
+  .sum-row{display:flex;align-items:center;padding:5px 0;border-bottom:1px solid #F0E8DC;font-size:12px;gap:6px;}
+  .sum-row:last-child{border-bottom:none;}
+  .sr-name{flex:1;color:var(--text);}
+  .sr-qty{font-size:10px;color:var(--text-lt);}
+  .sr-val{font-weight:600;color:var(--brown-dk);}
+  .bar-bg{background:var(--cream2);border-radius:3px;height:5px;width:100%;margin-top:2px;}
+  .bar-fill{border-radius:3px;height:5px;transition:width 0.5s;}
+  .bar-fill.coffee{background:var(--brown);}
+  .bar-fill.matcha{background:#4A7C2F;}
+  .bar-fill.tea{background:#7A4F2E;}
+  .bar-fill.soda{background:#1869A8;}
+  .bar-fill.softcream{background:var(--red);}
+  .bar-fill.extra{background:#777;}
+  .bar-fill.default{background:var(--brown-lt);}
+  .no-data{text-align:center;color:var(--text-lt);font-size:12px;padding:18px 0;font-weight:300;}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--brown-dk);color:var(--cream);padding:10px 22px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(60,20,5,0.25);}
+  .toast.show{opacity:1;}
+  ::-webkit-scrollbar{width:3px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="brand">
     <span class="brand-name">NaiBaaN Cafe' & Desserts</span>
@@ -379,20 +130,25 @@
   </div>
 </div>
 
-<!-- STATS -->
-<div class="stats">
-  <div class="stat"><div class="lbl">ยอดวันนี้</div><div class="val" id="sTotalDay">฿0</div></div>
+<!-- stats bar: pos shows 2 cols, summary shows 4 cols -->
+<div class="stats pos-stats" id="statsPos">
   <div class="stat"><div class="lbl">จำนวนออเดอร์</div><div class="val" id="sOrderCnt">0</div></div>
+  <div class="stat"><div class="lbl">จำนวนแก้ว (วันนี้)</div><div class="val" id="sCupCnt">0</div></div>
   <div class="stat"><div class="lbl">รายการในตะกร้า</div><div class="val" id="sCartCnt">0</div></div>
+</div>
+<div class="stats sum-stats" id="statsSum" style="display:none;">
+  <div class="stat"><div class="lbl">ยอดวันนี้</div><div class="val" id="sTotalDay">฿0</div></div>
+  <div class="stat"><div class="lbl">จำนวนออเดอร์</div><div class="val" id="sOrderCnt2">0</div></div>
+  <div class="stat"><div class="lbl">จำนวนแก้ว (วันนี้)</div><div class="val" id="sCupCnt2">0</div></div>
+  <div class="stat"><div class="lbl">รายการในตะกร้า</div><div class="val" id="sCartCnt2">0</div></div>
   <div class="stat"><div class="lbl">เฉลี่ย/ออเดอร์</div><div class="val" id="sAvg">฿0</div></div>
 </div>
 
-<!-- POS PAGE -->
 <div class="page active" id="page-pos">
   <div class="pos-wrap">
     <div class="menu-panel">
       <div class="cats" id="catRow"></div>
-      <div class="menu-grid" id="menuGrid"></div>
+      <div id="menuArea"></div>
     </div>
     <div class="order-panel">
       <div class="order-head">🛒 ตะกร้าออเดอร์</div>
@@ -406,21 +162,16 @@
         </div>
         <div class="pay-label">วิธีชำระเงิน</div>
         <div class="pay-btns">
-          <button class="pay-btn cash" id="btnCash" onclick="selectPay('cash')">
-            <span class="pay-indicator">💵</span> เงินสด
-          </button>
-          <button class="pay-btn transfer" id="btnTransfer" onclick="selectPay('transfer')">
-            <span class="pay-indicator">📲</span> โอน
-          </button>
+          <button class="pay-btn cash" id="btnCash" onclick="selectPay('cash')">💵 เงินสด</button>
+          <button class="pay-btn transfer" id="btnTransfer" onclick="selectPay('transfer')">📲 โอน</button>
         </div>
-        <button class="ok-btn" id="okBtn" disabled onclick="submitOrder()">เลือกวิธีชำระก่อน</button>
+        <button class="ok-btn" id="okBtn" disabled onclick="submitOrder()">เพิ่มเมนูก่อน</button>
         <button class="clear-btn" onclick="clearCart()">✕ ล้างตะกร้า</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SUMMARY PAGE -->
 <div class="page" id="page-summary">
   <div class="sum-page">
     <div class="sum-grid">
@@ -443,87 +194,90 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyb6ulMNSL4ZgzZt8kq9tMs4ym9YnIbw4j94WogMBPiTKCl0Q8Fs-Ity5fg6DAX0V9d/exec';
-
-const CATS = [
-  {id:'all',      label:'ทั้งหมด',     cls:''},
-  {id:'coffee',   label:'☕ Coffee',    cls:'c-coffee'},
-  {id:'matcha',   label:'🍵 Matcha',    cls:'c-matcha'},
-  {id:'tea',      label:'🧋 ชา & โกโก้', cls:'c-tea'},
-  {id:'softcream',label:'🍦 Soft Cream', cls:'c-softcream'},
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyb6ulMNSL4ZgzZt8kq9tMs4ym9YnIbw4j94WogMBPiTKCl0Q8Fs-Ity5fg6DAX0V9d/exec';
+const CATS=[
+  {id:'all',label:'ทั้งหมด',cls:''},
+  {id:'coffee',label:'☕ Coffee',cls:'c-coffee'},
+  {id:'matcha',label:'🍵 Matcha',cls:'c-matcha'},
+  {id:'tea',label:'🧋 ชา & โกโก้',cls:'c-tea'},
+  {id:'soda',label:'🫧 โซดา',cls:'c-soda'},
+  {id:'softcream',label:'🍦 Soft Cream',cls:'c-softcream'},
+  {id:'extra',label:'➕ อื่นๆ',cls:'c-extra'},
 ];
-
-const MENUS = [
-  {id:1,  name:'Americano',            th:'อเมริกาโน่',         price:35, cat:'coffee',    icon:'☕'},
-  {id:2,  name:'Americano Honey',      th:'อเมริกาโน่น้ำผึ้ง',  price:40, cat:'coffee',    icon:'🍯'},
-  {id:3,  name:'Americano Cold Foam',  th:'อเมริกาโน่โฟม',      price:40, cat:'coffee',    icon:'☁️'},
-  {id:4,  name:'Latte',                th:'ลาเต้',              price:40, cat:'coffee',    icon:'🥛'},
-  {id:5,  name:'Espresso',             th:'เอสเปรสโซ่',         price:40, cat:'coffee',    icon:'☕'},
-  {id:6,  name:'Cappuccino',           th:'คาปูชิโน่',          price:40, cat:'coffee',    icon:'☕'},
-  {id:7,  name:'Mocha',                th:'มอคค่า',             price:45, cat:'coffee',    icon:'🍫'},
-  {id:8,  name:'Peanut Butter Latte',  th:'ลาเต้เนยถั่ว',       price:50, cat:'coffee',    icon:'🥜'},
-  {id:9,  name:'Black Coffee Coconut', th:'กาแฟน้ำมะพร้าว',    price:45, cat:'coffee',    icon:'🥥'},
-  {id:10, name:'BK Coffee Honey Lemon',th:'กาแฟน้ำผึ้งมะนาว',  price:45, cat:'coffee',    icon:'🍋'},
-  {id:11, name:'Black Coffee Orange',  th:'กาแฟส้ม',            price:45, cat:'coffee',    icon:'🍊'},
-  {id:12, name:'Matcha Latte',         th:'มัทฉะลาเต้',         price:35, cat:'matcha',    icon:'🍵'},
-  {id:13, name:'Pure Matcha',          th:'เพียวมัทฉะ',         price:35, cat:'matcha',    icon:'🍵'},
-  {id:14, name:'Matcha Honey Lemon',   th:'มัทฉะน้ำผึ้งมะนาว', price:45, cat:'matcha',    icon:'🍋'},
-  {id:15, name:'Matcha Orange',        th:'มัทฉะส้ม',           price:45, cat:'matcha',    icon:'🍊'},
-  {id:16, name:'Matcha Coconut Foam',  th:'มัทฉะมะพร้าวโฟม',   price:45, cat:'matcha',    icon:'🥥'},
-  {id:17, name:'Matcha Strawberry',    th:'มัทฉะสตอเบอรี่',    price:45, cat:'matcha',    icon:'🍓'},
-  {id:18, name:'Oreo Matcha',          th:'โอริโอ้มัทฉะ',       price:45, cat:'matcha',    icon:'🍃'},
-  {id:19, name:'Peanut Butter Matcha', th:'มัทฉะเนยถั่ว',      price:50, cat:'matcha',    icon:'🥜'},
-  {id:20, name:'Thai Tea',             th:'ชาไทย',              price:35, cat:'tea',       icon:'🧋'},
-  {id:21, name:'Green Tea',            th:'ชาเขียว',            price:35, cat:'tea',       icon:'🍵'},
-  {id:22, name:'Premium Cocoa',        th:'พรีเมี่ยมโกโก้',    price:35, cat:'tea',       icon:'🍫'},
-  {id:23, name:'Oreo Cocoa',           th:'โอริโอ้โกโก้',       price:45, cat:'tea',       icon:'🍪'},
-  {id:24, name:'Soft Cream Latte',     th:'ซอฟครีมลาเต้',      price:60, cat:'softcream', icon:'🍦'},
-  {id:25, name:'Soft Cream Cocoa',     th:'ซอฟครีมโกโก้',      price:60, cat:'softcream', icon:'🍦'},
-  {id:26, name:'Soft Cream Matcha',    th:'ซอฟครีมมัทฉะ',     price:60, cat:'softcream', icon:'🍦'},
+const MENUS=[
+  {id:1,name:'Americano',th:'อเมริกาโน่',price:35,cat:'coffee',icon:'☕'},
+  {id:2,name:'Americano Honey',th:'อเมริกาโน่น้ำผึ้ง',price:40,cat:'coffee',icon:'🍯'},
+  {id:3,name:'Americano Cold Foam',th:'อเมริกาโน่โฟม',price:40,cat:'coffee',icon:'☁️'},
+  {id:4,name:'Latte',th:'ลาเต้',price:40,cat:'coffee',icon:'🥛'},
+  {id:5,name:'Espresso',th:'เอสเปรสโซ่',price:40,cat:'coffee',icon:'☕'},
+  {id:6,name:'Cappuccino',th:'คาปูชิโน่',price:40,cat:'coffee',icon:'☕'},
+  {id:7,name:'Mocha',th:'มอคค่า',price:45,cat:'coffee',icon:'🍫'},
+  {id:8,name:'Peanut Butter Latte',th:'ลาเต้เนยถั่ว',price:50,cat:'coffee',icon:'🥜'},
+  {id:9,name:'Black Coffee Coconut',th:'กาแฟน้ำมะพร้าว',price:45,cat:'coffee',icon:'🥥'},
+  {id:10,name:'Black Coffee Honey Lemon',th:'กาแฟน้ำผึ้งมะนาว',price:45,cat:'coffee',icon:'🍋'},
+  {id:11,name:'Black Coffee Orange',th:'กาแฟส้ม',price:45,cat:'coffee',icon:'🍊'},
+  {id:12,name:'Matcha Latte',th:'มัทฉะลาเต้',price:35,cat:'matcha',icon:'🍵'},
+  {id:13,name:'Pure Matcha',th:'เพียวมัทฉะ',price:35,cat:'matcha',icon:'🍵'},
+  {id:14,name:'Matcha Honey Lemon',th:'มัทฉะน้ำผึ้งมะนาว',price:45,cat:'matcha',icon:'🍋'},
+  {id:15,name:'Matcha Orange',th:'มัทฉะส้ม',price:45,cat:'matcha',icon:'🍊'},
+  {id:16,name:'Matcha Coconut Foam',th:'มัทฉะมะพร้าวโฟม',price:45,cat:'matcha',icon:'🥥'},
+  {id:17,name:'Matcha Strawberry',th:'มัทฉะสตอเบอรี่',price:45,cat:'matcha',icon:'🍓'},
+  {id:18,name:'Oreo Matcha',th:'โอริโอ้มัทฉะ',price:45,cat:'matcha',icon:'🍃'},
+  {id:19,name:'Peanut Butter Matcha',th:'มัทฉะเนยถั่ว',price:50,cat:'matcha',icon:'🥜'},
+  {id:20,name:'Thai Tea',th:'ชาไทย',price:35,cat:'tea',icon:'🧋'},
+  {id:21,name:'Green Tea',th:'ชาเขียว',price:35,cat:'tea',icon:'🍵'},
+  {id:22,name:'Premium Cocoa',th:'พรีเมี่ยมโกโก้',price:35,cat:'tea',icon:'🍫'},
+  {id:23,name:'Oreo Cocoa',th:'โอริโอ้โกโก้',price:45,cat:'tea',icon:'🍪'},
+  {id:24,name:'Lychee Soda',th:'ลิ้นจี่โซดา',price:45,cat:'soda',icon:'🫧'},
+  {id:25,name:'Orange Soda',th:'ส้มโซดา',price:45,cat:'soda',icon:'🍊'},
+  {id:26,name:'Strawberry Soda',th:'สตรอเบอรี่โซดา',price:45,cat:'soda',icon:'🍓'},
+  {id:27,name:'Soft Cream Latte',th:'ซอฟครีมลาเต้',price:60,cat:'softcream',icon:'🍦'},
+  {id:28,name:'Soft Cream Cocoa',th:'ซอฟครีมโกโก้',price:60,cat:'softcream',icon:'🍦'},
+  {id:29,name:'Soft Cream Matcha',th:'ซอฟครีมมัทฉะ',price:60,cat:'softcream',icon:'🍦'},
 ];
+const EXTRA_PRICES=[5,10,15,20,25,30,35,40,45,50];
 
-let cart={}, curCat='all', payMethod='', dailyTotal=0, orderCnt=0;
-let allOrders=[], soldMap={}, catMap={};
+let cart={},curCat='all',payMethod='';
+let dailyTotal=0,orderCnt=0,dailyCups=0,allOrders=[],soldMap={},catMap={};
 
-/* Clock */
 function updateClock(){
   const n=new Date();
   document.getElementById('clockTxt').textContent=
     n.toLocaleDateString('th-TH',{weekday:'short',day:'numeric',month:'short'})+
     ' '+n.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
 }
-setInterval(updateClock,10000); updateClock();
+setInterval(updateClock,10000);updateClock();
 
-/* Pages */
 function showPage(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach((b,i)=>{
     b.classList.toggle('active',(p==='pos'&&i===0)||(p==='summary'&&i===1));
   });
+  document.getElementById('statsPos').style.display=p==='pos'?'grid':'none';
+  document.getElementById('statsSum').style.display=p==='summary'?'grid':'none';
   if(p==='summary') renderSummary();
 }
 
-/* Build category tabs */
 const catRow=document.getElementById('catRow');
 CATS.forEach(c=>{
   const b=document.createElement('button');
-  b.className='cat-btn'+(c.cls?' '+c.cls:'')+( c.id==='all'?' active':'');
-  b.dataset.id=c.id;
+  b.className='cat-btn'+(c.cls?' '+c.cls:'')+(c.id==='all'?' active':'');
   b.textContent=c.label;
-  b.onclick=()=>{
-    curCat=c.id;
-    document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    renderMenu();
-  };
+  b.onclick=()=>{curCat=c.id;document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderMenu();};
   catRow.appendChild(b);
 });
 
-/* Render menu */
 function renderMenu(){
+  const area=document.getElementById('menuArea');
+  if(curCat==='extra'){
+    area.innerHTML='<div class="extra-grid">'+
+      EXTRA_PRICES.map(p=>`<div class="extra-btn" onclick="addExtra(${p})"><div class="ep">฿${p}</div><div class="el">เพิ่มเติม</div></div>`).join('')+
+    '</div>';
+    return;
+  }
   const list=curCat==='all'?MENUS:MENUS.filter(m=>m.cat===curCat);
-  document.getElementById('menuGrid').innerHTML=list.map(m=>{
+  area.innerHTML='<div class="menu-grid">'+list.map(m=>{
     const q=cart[m.id]?cart[m.id].qty:0;
     return`<div class="menu-btn${q?' in-cart':''}" onclick="addItem(${m.id})">
       ${q?`<div class="badge">${q}</div>`:''}
@@ -532,151 +286,151 @@ function renderMenu(){
       <div class="mname-th">${m.th}</div>
       <div class="mprice">฿${m.price}</div>
     </div>`;
-  }).join('');
+  }).join('')+'</div>';
 }
 
-/* Cart operations */
+function addExtra(price){
+  const key='extra_'+price;
+  if(!cart[key]) cart[key]={id:key,name:'เพิ่มเติม',th:'',price:price,qty:0,cat:'extra',icon:'➕'};
+  cart[key].qty++;
+  refreshUI();
+}
 function addItem(id){
   const m=MENUS.find(x=>x.id===id);
   if(!cart[id]) cart[id]={...m,qty:0};
   cart[id].qty++;
   refreshUI();
 }
-function changeQty(id,d){
-  if(!cart[id]) return;
-  cart[id].qty+=d;
-  if(cart[id].qty<=0) delete cart[id];
+function changeQty(key,d){
+  key=isNaN(key)?key:Number(key);
+  if(!cart[key]) return;
+  cart[key].qty+=d;
+  if(cart[key].qty<=0) delete cart[key];
   refreshUI();
 }
 function clearCart(){
-  cart={}; payMethod='';
+  cart={};payMethod='';
   document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('selected'));
   refreshUI();
 }
-function getTotal(){ return Object.values(cart).reduce((s,i)=>s+i.price*i.qty,0); }
+function getTotal(){return Object.values(cart).reduce((s,i)=>s+i.price*i.qty,0);}
 
-/* Payment selection */
 function selectPay(method){
   payMethod=method;
-  document.getElementById('btnCash').classList.toggle('selected', method==='cash');
-  document.getElementById('btnTransfer').classList.toggle('selected', method==='transfer');
+  document.getElementById('btnCash').classList.toggle('selected',method==='cash');
+  document.getElementById('btnTransfer').classList.toggle('selected',method==='transfer');
   updateOkBtn();
 }
 function updateOkBtn(){
   const btn=document.getElementById('okBtn');
   const cnt=Object.values(cart).reduce((s,i)=>s+i.qty,0);
-  if(cnt===0){ btn.disabled=true; btn.classList.remove('ready'); btn.textContent='เลือกวิธีชำระก่อน'; return; }
-  if(!payMethod){ btn.disabled=true; btn.classList.remove('ready'); btn.textContent='เลือกวิธีชำระก่อน'; return; }
-  btn.disabled=false;
-  btn.classList.add('ready');
+  if(cnt===0){btn.disabled=true;btn.classList.remove('ready');btn.textContent='เพิ่มเมนูก่อน';return;}
+  if(!payMethod){btn.disabled=true;btn.classList.remove('ready');btn.textContent='เลือกวิธีชำระก่อน';return;}
+  btn.disabled=false;btn.classList.add('ready');
   btn.textContent=`✓ ยืนยัน — ${payMethod==='cash'?'💵 เงินสด':'📲 โอน'} ฿${getTotal()}`;
 }
-
-/* Render cart */
 function refreshUI(){
   renderMenu();
   const items=Object.values(cart);
   const el=document.getElementById('orderList');
-  if(!items.length){
-    el.innerHTML='<div class="empty-cart">ยังไม่มีรายการ<br>กดเมนูเพื่อเพิ่ม</div>';
-  } else {
-    el.innerHTML=items.map(i=>`
-      <div class="order-item">
-        <span class="oi-name">${i.icon} ${i.name}<small>${i.th} · ฿${i.price}×${i.qty}</small></span>
-        <div class="qty-wrap">
-          <button class="qb${i.qty===1?' del':''}" onclick="changeQty(${i.id},-1)">${i.qty===1?'🗑':'−'}</button>
-          <span class="qn">${i.qty}</span>
-          <button class="qb" onclick="changeQty(${i.id},1)">+</button>
-        </div>
-        <span class="oi-price">฿${i.price*i.qty}</span>
-      </div>`).join('');
+  if(!items.length){el.innerHTML='<div class="empty-cart">ยังไม่มีรายการ<br>กดเมนูเพื่อเพิ่ม</div>';}
+  else{
+    el.innerHTML=items.map(i=>`<div class="order-item">
+      <span class="oi-name">${i.icon} ${i.name}<small>${i.th?i.th+' · ':''}฿${i.price}×${i.qty}</small></span>
+      <div class="qty-wrap">
+        <button class="qb${i.qty===1?' del':''}" onclick="changeQty('${i.id}',-1)">${i.qty===1?'🗑':'−'}</button>
+        <span class="qn">${i.qty}</span>
+        <button class="qb" onclick="changeQty('${i.id}',1)">+</button>
+      </div>
+      <span class="oi-price">฿${i.price*i.qty}</span>
+    </div>`).join('');
   }
   const total=getTotal();
   const cnt=items.reduce((s,i)=>s+i.qty,0);
+  const cupsInCart=items.filter(i=>i.cat!=='extra').reduce((s,i)=>s+i.qty,0);
   document.getElementById('totalVal').textContent='฿'+total;
   document.getElementById('sCartCnt').textContent=cnt;
+  document.getElementById('sCartCnt2').textContent=cnt;
+  document.getElementById('sCupCnt').textContent=(dailyCups+cupsInCart);
+  document.getElementById('sCupCnt2').textContent=(dailyCups+cupsInCart);
   updateOkBtn();
 }
 
-/* Submit */
 async function submitOrder(){
   const items=Object.values(cart);
   if(!items.length||!payMethod) return;
   const btn=document.getElementById('okBtn');
-  btn.disabled=true; btn.classList.remove('ready'); btn.textContent='⏳ กำลังบันทึก...';
+  btn.disabled=true;btn.classList.remove('ready');btn.textContent='⏳ กำลังบันทึก...';
   const now=new Date();
   const dateStr=now.toLocaleDateString('th-TH');
   const timeStr=now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   const total=getTotal();
   const payLabel=payMethod==='cash'?'เงินสด':'โอน';
   const rows=items.map(i=>({
-    date:dateStr, time:timeStr,
-    menu:i.name, menu_th:i.th,
-    qty:i.qty, unit_price:i.price,
-    subtotal:i.price*i.qty, order_total:total,
-    category:i.cat, pay:payLabel
+    date:dateStr,time:timeStr,
+    menu:i.name,menu_th:i.th||'-',
+    qty:i.qty,unit_price:i.price,
+    subtotal:i.price*i.qty,order_total:total,
+    category:i.cat,pay:payLabel
   }));
-
-  dailyTotal+=total; orderCnt++;
+  dailyTotal+=total;orderCnt++;
+  const cupsThisOrder=items.filter(i=>i.cat!=='extra').reduce((s,i)=>s+i.qty,0);
+  dailyCups+=cupsThisOrder;
   items.forEach(i=>{
-    soldMap[i.name]=(soldMap[i.name]||0)+i.qty;
+    const label=i.cat==='extra'?`เพิ่มเติม ฿${i.price}`:i.name;
+    soldMap[label]=(soldMap[label]||0)+i.qty;
     catMap[i.cat]=(catMap[i.cat]||0)+i.price*i.qty;
   });
-  allOrders.unshift({time:timeStr, items:items.map(i=>`${i.icon}${i.name}×${i.qty}`).join(', '), total, pay:payLabel});
+  allOrders.unshift({time:timeStr,items:items.map(i=>`${i.icon}${i.name}×${i.qty}`).join(', '),total,pay:payLabel});
   document.getElementById('sTotalDay').textContent='฿'+dailyTotal.toLocaleString();
   document.getElementById('sOrderCnt').textContent=orderCnt;
+  document.getElementById('sOrderCnt2').textContent=orderCnt;
+  document.getElementById('sCupCnt').textContent=dailyCups;
+  document.getElementById('sCupCnt2').textContent=dailyCups;
   document.getElementById('sAvg').textContent='฿'+Math.round(dailyTotal/orderCnt);
-
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({rows})});
     toast(`✓ บันทึกแล้ว ${payLabel} ฿${total}`);
-  } catch(e){
-    toast('⚠️ เน็ตขัด — บันทึกไม่สำเร็จ');
-  }
+  }catch(e){toast('⚠️ เน็ตขัด — บันทึกไม่สำเร็จ');}
   clearCart();
-  btn.textContent='เลือกวิธีชำระก่อน';
+  btn.textContent='เพิ่มเมนูก่อน';
 }
 
-/* Summary */
 function renderSummary(){
   const topEl=document.getElementById('topMenus');
   const sorted=Object.entries(soldMap).sort((a,b)=>b[1]-a[1]).slice(0,7);
-  if(!sorted.length){ topEl.innerHTML='<div class="no-data">ยังไม่มีออเดอร์</div>'; }
+  if(!sorted.length){topEl.innerHTML='<div class="no-data">ยังไม่มีออเดอร์</div>';}
   else{
     const max=sorted[0][1];
     topEl.innerHTML=sorted.map(([name,qty])=>{
       const m=MENUS.find(x=>x.name===name);
-      return`<div><div class="sum-row"><span class="sr-name">${m?m.icon:''} ${name}</span><span class="sr-qty">${qty} แก้ว</span><span class="sr-val">×${qty}</span></div>
-      <div class="bar-bg"><div class="bar-fill ${m?m.cat:'default'}" style="width:${Math.round(qty/max*100)}%"></div></div></div>`;
+      const cat=m?m.cat:'extra';
+      return`<div><div class="sum-row"><span class="sr-name">${m?m.icon:'➕'} ${name}</span><span class="sr-qty">${qty} รายการ</span><span class="sr-val">×${qty}</span></div>
+      <div class="bar-bg"><div class="bar-fill ${cat}" style="width:${Math.round(qty/max*100)}%"></div></div></div>`;
     }).join('');
   }
   const catEl=document.getElementById('catSum');
-  const catNames={coffee:'☕ Coffee',matcha:'🍵 Matcha',tea:'🧋 ชา & โกโก้',softcream:'🍦 Soft Cream'};
+  const catNames={coffee:'☕ Coffee',matcha:'🍵 Matcha',tea:'🧋 ชา & โกโก้',soda:'🫧 โซดา',softcream:'🍦 Soft Cream',extra:'➕ อื่นๆ'};
   const ce=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
-  if(!ce.length){ catEl.innerHTML='<div class="no-data">ยังไม่มีออเดอร์</div>'; }
+  if(!ce.length){catEl.innerHTML='<div class="no-data">ยังไม่มีออเดอร์</div>';}
   else{
     const cm=ce[0][1];
     catEl.innerHTML=ce.map(([cat,val])=>`<div><div class="sum-row"><span class="sr-name">${catNames[cat]||cat}</span><span class="sr-val">฿${val.toLocaleString()}</span></div>
     <div class="bar-bg"><div class="bar-fill ${cat}" style="width:${Math.round(val/cm*100)}%"></div></div></div>`).join('');
   }
   const recEl=document.getElementById('recentOrders');
-  if(!allOrders.length){ recEl.innerHTML='<div class="no-data">ยังไม่มีออเดอร์</div>'; }
+  if(!allOrders.length){recEl.innerHTML='<div class="no-data">ยังไม่มีออเดอร์</div>';}
   else{
     recEl.innerHTML=allOrders.slice(0,10).map((o,i)=>`<div class="sum-row">
       <span class="sr-name" style="font-size:11px;color:#B09070">#${orderCnt-i} · ${o.time}</span>
       <span class="sr-name" style="flex:2;font-size:11px;color:#B09070">${o.items}</span>
-      <span style="font-size:10px;font-weight:500;color:${o.pay==='โอน'?'#9B2335':'#5C3D1E'};margin-right:6px">${o.pay}</span>
+      <span style="font-size:10px;font-weight:600;color:${o.pay==='โอน'?'#9B2335':'#5C3D1E'};margin-right:4px">${o.pay}</span>
       <span class="sr-val">฿${o.total}</span>
     </div>`).join('');
   }
 }
 
-function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2600);
-}
-
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
 renderMenu();
 </script>
 </body>
