@@ -405,23 +405,33 @@ async function submitOrder(){
 }
 
 
-/* ── Load today\'s data from Sheet then render ── */
-async function loadAndRenderSummary(){
+/* ── Load today's data via JSONP (bypasses CORS) ── */
+function loadAndRenderSummary(){
   document.getElementById('topMenus').innerHTML='<div class="no-data">⏳ กำลังโหลด...</div>';
-  document.getElementById('catSum').innerHTML='';
-  document.getElementById('recentOrders').innerHTML='';
-  try{
-    const today=new Date().toLocaleDateString('th-TH');
-    const url=SCRIPT_URL+'?action=get&date='+encodeURIComponent(today);
-    const res=await fetch(url,{mode:'cors'});
-    const rows=await res.json(); /* array of row objects */
-    buildSummaryFromRows(rows,today);
-  }catch(e){
-    /* fallback to in-memory if fetch fails */
+  document.getElementById('catSum').innerHTML='<div class="no-data"></div>';
+  document.getElementById('recentOrders').innerHTML='<div class="no-data"></div>';
+
+  /* remove old script tag if any */
+  const old=document.getElementById('_jsonp');
+  if(old) old.remove();
+
+  /* timeout fallback */
+  const timer=setTimeout(()=>{
     renderSummaryFromMemory();
     document.getElementById('recentOrders').insertAdjacentHTML('afterbegin',
-      '<div style="font-size:11px;color:#B09070;padding:4px 0;">⚠️ ใช้ข้อมูลใน memory (เน็ตขัด)</div>');
-  }
+      '<div style="font-size:11px;color:#9B2335;padding:4px 0;">⚠️ โหลดจาก Sheet ไม่สำเร็จ (ใช้ข้อมูล memory)</div>');
+  },8000);
+
+  window._sheetCallback=function(rows){
+    clearTimeout(timer);
+    const today=new Date().toLocaleDateString('th-TH');
+    buildSummaryFromRows(rows,today);
+  };
+
+  const s=document.createElement('script');
+  s.id='_jsonp';
+  s.src=SCRIPT_URL+'?action=get&callback=_sheetCallback';
+  document.body.appendChild(s);
 }
 
 function buildSummaryFromRows(rows,today){
