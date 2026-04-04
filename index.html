@@ -116,6 +116,8 @@
   .no-data{text-align:center;color:var(--text-lt);font-size:12px;padding:18px 0;font-weight:300;}
   .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--brown-dk);color:var(--cream);padding:10px 22px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(60,20,5,0.25);}
   .toast.show{opacity:1;}
+  .offline-badge{display:none;align-items:center;background:#9B2335;color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;margin-right:8px;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.7;}}
   ::-webkit-scrollbar{width:3px;}
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
@@ -132,6 +134,7 @@
     </div>
   </div>
   <div class="header-right">
+    <span class="offline-badge" id="offlineBadge"></span>
     <span class="clock" id="clockTxt"></span>
     <button class="nav-btn active" onclick="showPage('pos')">รับออเดอร์</button>
     <button class="nav-btn" onclick="showPage('summary')">สรุปยอด</button>
@@ -224,11 +227,11 @@ const MENUS=[
   {id:9,name:'Black Coffee Coconut',th:'กาแฟน้ำมะพร้าว',price:45,cat:'coffee',icon:'🥥'},
   {id:10,name:'Black Coffee Honey Lemon',th:'กาแฟน้ำผึ้งมะนาว',price:45,cat:'coffee',icon:'🍋'},
   {id:11,name:'Black Coffee Orange',th:'กาแฟส้ม',price:45,cat:'coffee',icon:'🍊'},
-  {id:12,name:'Matcha Latte',th:'มัทฉะลาเต้',price:35,cat:'matcha',icon:'🍵'},
+  {id:12,name:'Matcha Latte',th:'มัทฉะลาเต้',price:40,cat:'matcha',icon:'🍵'},
   {id:13,name:'Pure Matcha',th:'เพียวมัทฉะ',price:35,cat:'matcha',icon:'🍵'},
   {id:14,name:'Matcha Honey Lemon',th:'มัทฉะน้ำผึ้งมะนาว',price:45,cat:'matcha',icon:'🍋'},
   {id:15,name:'Matcha Orange',th:'มัทฉะส้ม',price:45,cat:'matcha',icon:'🍊'},
-  {id:16,name:'Matcha Coconut Foam',th:'มัทฉะมะพร้าวโฟม',price:45,cat:'matcha',icon:'🥥'},
+  {id:16,name:'Matcha Coconut Foam',th:'มัทฉะมะพร้าวโฟม',price:50,cat:'matcha',icon:'🥥'},
   {id:17,name:'Matcha Strawberry',th:'มัทฉะสตอเบอรี่',price:45,cat:'matcha',icon:'🍓'},
   {id:18,name:'Oreo Matcha',th:'โอริโอ้มัทฉะ',price:45,cat:'matcha',icon:'🍃'},
   {id:19,name:'Peanut Butter Matcha',th:'มัทฉะเนยถั่ว',price:50,cat:'matcha',icon:'🥜'},
@@ -272,7 +275,9 @@ CATS.forEach(c=>{
   const b=document.createElement('button');
   b.className='cat-btn'+(c.cls?' '+c.cls:'')+(c.id==='all'?' active':'');
   b.textContent=c.label;
-  b.onclick=()=>{curCat=c.id;document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderMenu();};
+  b.onclick=()=>{curCat=c.id;document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderMenu();
+updateQueueBadge();
+if(navigator.onLine) flushQueue();};
   catRow.appendChild(b);
 });
 
@@ -364,6 +369,39 @@ function refreshUI(){
   updateOkBtn();
 }
 
+/* ══════════════════════════════════════════
+   OFFLINE QUEUE  — บันทึกออเดอร์ไว้ใน localStorage
+   และส่งขึ้น Google Sheet อัตโนมัติเมื่อเน็ตกลับมา
+   ══════════════════════════════════════════ */
+const QUEUE_KEY='naibaanQueue';
+function loadQueue(){try{return JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]');}catch(e){return[];}}
+function saveQueue(q){try{localStorage.setItem(QUEUE_KEY,JSON.stringify(q));}catch(e){}}
+function updateQueueBadge(){
+  const q=loadQueue();
+  let badge=document.getElementById('offlineBadge');
+  if(!badge) return;
+  if(q.length===0){badge.style.display='none';}
+  else{badge.style.display='inline-flex';badge.textContent='📴 รอส่ง '+q.length+' รายการ';}
+}
+async function flushQueue(){
+  const q=loadQueue();
+  if(!q.length) return;
+  const failed=[];
+  for(const item of q){
+    try{
+      await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({rows:item.rows})});
+    }catch(e){failed.push(item);}
+  }
+  saveQueue(failed);
+  updateQueueBadge();
+  if(failed.length===0 && q.length>0) toast('✓ ส่งข้อมูลที่ค้างอยู่ '+q.length+' ออเดอร์เรียบร้อย');
+}
+window.addEventListener('online',()=>{
+  toast('🌐 เน็ตกลับมาแล้ว — กำลังส่งข้อมูลที่ค้างไว้...');
+  setTimeout(flushQueue,1500);
+});
+setInterval(()=>{if(navigator.onLine) flushQueue();},60000);
+
 async function submitOrder(){
   const items=Object.values(cart);
   if(!items.length||!payMethod) return;
@@ -385,21 +423,32 @@ async function submitOrder(){
   const cupsThisOrder=items.filter(i=>i.cat!=='extra').reduce((s,i)=>s+i.qty,0);
   dailyCups+=cupsThisOrder;
   items.forEach(i=>{
-    const label=i.cat==='extra'?`เพิ่มเติม ฿${i.price}`:i.name;
+    const label=i.cat==='extra'?'เพิ่มเติม ฿'+i.price:i.name;
     soldMap[label]=(soldMap[label]||0)+i.qty;
     catMap[i.cat]=(catMap[i.cat]||0)+i.price*i.qty;
   });
-  allOrders.unshift({time:timeStr,items:items.map(i=>`${i.icon}${i.name}×${i.qty}`).join(', '),total,pay:payLabel});
+  allOrders.unshift({time:timeStr,items:items.map(i=>i.icon+i.name+'x'+i.qty).join(', '),total,pay:payLabel});
   document.getElementById('sTotalDay').textContent='฿'+dailyTotal.toLocaleString();
   document.getElementById('sOrderCnt').textContent=orderCnt;
   document.getElementById('sOrderCnt2').textContent=orderCnt;
   document.getElementById('sCupCnt').textContent=dailyCups;
   document.getElementById('sCupCnt2').textContent=dailyCups;
   document.getElementById('sAvg').textContent='฿'+Math.round(dailyTotal/orderCnt);
-  try{
-    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({rows})});
-    toast(`✓ บันทึกแล้ว ${payLabel} ฿${total}`);
-  }catch(e){toast('⚠️ เน็ตขัด — บันทึกไม่สำเร็จ');}
+  let sentOnline=false;
+  if(navigator.onLine){
+    try{
+      await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({rows})});
+      sentOnline=true;
+      toast('✓ บันทึกแล้ว '+payLabel+' ฿'+total);
+    }catch(e){}
+  }
+  if(!sentOnline){
+    const q=loadQueue();
+    q.push({rows,savedAt:new Date().toISOString()});
+    saveQueue(q);
+    updateQueueBadge();
+    toast('💾 บันทึกชั่วคราว ('+payLabel+' ฿'+total+') — จะส่งเมื่อเน็ตกลับมา');
+  }
   clearCart();
   btn.textContent='เพิ่มเมนูก่อน';
 }
